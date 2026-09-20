@@ -20,6 +20,7 @@
  * cannot sit in `loading` forever.
  */
 
+import { API_BASE } from "./base";
 export type JobEventStatus = "running" | "done" | "error";
 
 export class JobStreamError extends Error {
@@ -72,7 +73,7 @@ export function subscribeJob<T = unknown>(
   { onStatus, signal, eventSourceCtor, maxNativeErrors, fetchJob }: SubscribeJobOptions = {},
 ): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    const url = `/api/jobs/${encodeURIComponent(jobId)}/events`;
+    const url = `${API_BASE}/jobs/${encodeURIComponent(jobId)}/events`;
     const Ctor = eventSourceCtor ?? EventSource;
     const source = new Ctor(url);
     const nativeErrorBudget = maxNativeErrors ?? DEFAULT_MAX_NATIVE_ERRORS;

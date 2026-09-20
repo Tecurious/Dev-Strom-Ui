@@ -1,3 +1,4 @@
+import { API_BASE } from "../api/base";
 /**
  * Auth state, backed by the server session cookie.
  *
@@ -43,7 +44,7 @@ export function refreshAuth(): Promise<void> {
   inflight = (async () => {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const res = await fetch("/api/auth/me", { credentials: "include" });
+        const res = await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
         state = res.ok
           ? { status: "authenticated", user: (await res.json()) as AuthUser }
           : { status: "anonymous", user: null };
@@ -64,7 +65,7 @@ export function refreshAuth(): Promise<void> {
 /** Providers the server has credentials for — the login page renders one button each. */
 export async function getProviders(): Promise<string[]> {
   try {
-    const res = await fetch("/api/auth/providers", { credentials: "include" });
+    const res = await fetch(`${API_BASE}/auth/providers`, { credentials: "include" });
     if (!res.ok) return [];
     return ((await res.json()) as { providers: string[] }).providers ?? [];
   } catch {
@@ -74,12 +75,12 @@ export async function getProviders(): Promise<string[]> {
 
 export function signIn(provider: string, next?: string): void {
   const q = next ? `?next=${encodeURIComponent(next)}` : "";
-  window.location.href = `/api/auth/${provider}/login${q}`;
+  window.location.href = `${API_BASE}/auth/${provider}/login${q}`;
 }
 
 export async function signOut(): Promise<void> {
   try {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" });
   } catch {
     /* ignore — cookie may already be gone */
   }

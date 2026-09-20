@@ -1,11 +1,10 @@
 /**
- * Thin typed fetch wrapper. Base URL is "/api" — see vite.config.ts for the
- * dev proxy that forwards /api/* to the FastAPI backend at
- * http://localhost:8000. In production this assumes the backend is served
- * behind the same origin under /api (e.g. via a reverse proxy).
+ * Thin typed fetch wrapper. Base URL comes from src/api/base.ts:
+ * VITE_API_BASE_URL (cross-origin, e.g. https://api.devstrom.site in prod)
+ * or same-origin "/api" (Vite dev proxy / reverse-proxy deployments).
  */
 
-const API_BASE = "/api";
+import { API_BASE } from "./base";
 
 export class ApiError extends Error {
   status: number;
