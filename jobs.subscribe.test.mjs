@@ -1,6 +1,9 @@
 /**
  * Node test for subscribeJob. Not part of the Vite app tsconfig.
- * Run from repo: node --experimental-strip-types --test web/jobs.subscribe.test.mjs
+ * Run: npm test (registers scripts/ts-extensionless-loader.mjs so plain
+ * Node follows the same extensionless relative imports — e.g. "./base",
+ * not "./base.ts" — that Vite's bundler-mode resolution uses everywhere
+ * in src/).
  */
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";

@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --experimental-strip-types --import ./scripts/register-ts-loader.mjs --test"
   },
   "dependencies": {
     "@xyflow/react": "^12.11.3",
