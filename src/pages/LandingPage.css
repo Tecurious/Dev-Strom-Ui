@@ -66,6 +66,16 @@
   transition: color 120ms ease, border-color 120ms ease;
 }
 
+/* The signed-in state renders "Sign out" as a <button>, not an <a> — reset
+   the UA button chrome (background, full border box, default cursor) that
+   .landing-nav__link's border-bottom-only override doesn't touch. */
+button.landing-nav__link {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
 .landing-nav__link:hover {
   color: var(--accent);
 }
@@ -442,61 +452,24 @@
   }
 }
 
-/* ── quick start code ────────────────────────────────────────────────── */
-.landing-code {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: var(--hairline) solid var(--canvas-border);
-  background: var(--canvas);
-}
-
-.landing-code__bar {
+/* ── get started ─────────────────────────────────────────────────────── */
+.landing-getstarted {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: var(--space-2) var(--space-4);
-  background: var(--canvas-2);
-  border-bottom: var(--hairline) solid var(--canvas-border);
+  flex-wrap: wrap;
+  gap: var(--space-5);
 }
 
-.landing-code__bar .mono-label {
-  color: var(--on-dark-2);
-}
-
-.landing-code__copy {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--on-dark-2);
-  transition: color 120ms ease;
-}
-
-.landing-code__copy:hover {
-  color: var(--on-dark);
-}
-
-.landing-code__copy svg {
-  width: 14px;
-  height: 14px;
-}
-
-.landing-code__pre {
+.landing-getstarted__lede {
   margin: 0;
-  padding: var(--space-5);
-  overflow-x: auto;
+  max-width: 46ch;
+  color: var(--ink-2);
 }
 
-.landing-code__pre code {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  line-height: 1.7;
-  color: var(--on-dark);
-  white-space: pre;
+.landing-getstarted__cta {
+  flex-shrink: 0;
+  text-decoration: none;
 }
 
 /* ── footer ──────────────────────────────────────────────────────────── */

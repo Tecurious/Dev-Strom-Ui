@@ -2,6 +2,16 @@
   "name": "dev-strom-ui",
   "compatibility_date": "2026-09-18",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    // This is a client-side-routed SPA (react-router-dom's BrowserRouter —
+    // see src/main.tsx), so every path but "/" is virtual: there's no
+    // dist/login/index.html etc. for Workers assets to match. Without this,
+    // the default is a plain 404 for any path other than "/" or a real
+    // static file — devstrom.site/login, /ideas, every deep link and every
+    // page refresh 404s at Cloudflare's edge, even though the route works
+    // fine in local dev (Vite's dev server SPA-fallbacks automatically).
+    // "single-page-application" serves index.html (200) for any unmatched
+    // path, handing routing to the client-side router as intended.
+    "not_found_handling": "single-page-application"
   }
 }

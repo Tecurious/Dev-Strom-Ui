@@ -19,9 +19,12 @@ const RunDetailPage = lazy(() =>
 const AnalysisDetailPage = lazy(() =>
   import("./pages/AnalysisDetailPage").then((m) => ({ default: m.AnalysisDetailPage })),
 );
+const ProfilePage = lazy(() =>
+  import("./pages/ProfilePage").then((m) => ({ default: m.ProfilePage })),
+);
 
 function isKnownAppPath(pathname: string): boolean {
-  if (pathname === "/ideas" || pathname === "/advisor") return true;
+  if (pathname === "/ideas" || pathname === "/advisor" || pathname === "/profile") return true;
   return /^\/history\/[^/]+$/.test(pathname) || /^\/analysis\/[^/]+$/.test(pathname);
 }
 
@@ -49,6 +52,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/history/:runId" element={<RunDetailPage />} />
         <Route path="/analysis/:runId" element={<AnalysisDetailPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </>
   );
