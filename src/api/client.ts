@@ -25,13 +25,18 @@ interface RequestOptions {
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
+  // API_BASE is absolute on a cross-origin deploy ("https://api.devstrom.site")
+  // and relative otherwise ("/api"); the base argument only resolves the
+  // relative form. Return the full href — returning pathname+search alone
+  // would drop the API's origin and send every call back to the SPA's own
+  // host, which serves static assets and never the API.
   const url = new URL(`${API_BASE}${path}`, window.location.origin);
   if (query) {
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined) url.searchParams.set(key, String(value));
     }
   }
-  return url.pathname + url.search;
+  return url.toString();
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
