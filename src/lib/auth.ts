@@ -13,6 +13,16 @@ export interface AuthUser {
   name: string | null;
   avatar_url: string | null;
   auth_provider: string;
+  /** ISO timestamp; null for the anonymous fallback user (AUTH_ENABLED=false). */
+  created_at: string | null;
+}
+
+/** Avatar-fallback initials from a display name, e.g. "Ada Lovelace" -> "AL". */
+export function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
 export type AuthState =

@@ -1,17 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { useAuth } from "../hooks/useAuth";
 import "./LandingPage.css";
-
-const GITHUB_URL = "https://github.com/vallaksa/Dev-strom";
-
-const QUICK_START = `git clone <repo-url>
-cd Dev-Strom
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-uvicorn app.api:api --reload`;
 
 /* ── icons ──────────────────────────────────────────────────────────────── */
 const svg = (d: string) => (
@@ -26,8 +17,6 @@ const CheckIcon = () => svg("M4 5h16M4 12h16M4 19h9M15.5 18l2 2 4-4");
 const RocketIcon = () =>
   svg("M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2M9 15l-3-3a12 12 0 0 1 8-9c3 0 5 2 5 5a12 12 0 0 1-9 8l-3-3Z");
 const FileIcon = () => svg("M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7l-4-4ZM14 3v4h4");
-const CopyIcon = () =>
-  svg("M9 9h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1ZM5 15H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1");
 
 function LogoMark() {
   return (
@@ -37,23 +26,13 @@ function LogoMark() {
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const { status, signOut } = useAuth();
   const [stack, setStack] = useState("");
-  const [copied, setCopied] = useState(false);
 
   const handleGenerate = (e: FormEvent) => {
     e.preventDefault();
     const q = stack.trim();
     navigate(q ? `/ideas?intent=${encodeURIComponent(q)}` : "/ideas");
-  };
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(QUICK_START);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      /* clipboard blocked — no-op */
-    }
   };
 
   return (
@@ -67,14 +46,21 @@ export function LandingPage() {
           <nav className="landing-nav__links">
             <NavLink to="/ideas" className="landing-nav__link">Ideas</NavLink>
             <NavLink to="/advisor" className="landing-nav__link">Repository Intelligence</NavLink>
-            <a href={GITHUB_URL} className="landing-nav__link" target="_blank" rel="noreferrer">
-              GitHub
-            </a>
           </nav>
           <div className="landing-nav__cta">
-            <Link to="/login" className="landing-nav__link landing-nav__signin">
-              Sign in
-            </Link>
+            {status === "authenticated" ? (
+              <button
+                type="button"
+                className="landing-nav__link landing-nav__signin"
+                onClick={() => void signOut()}
+              >
+                Sign out
+              </button>
+            ) : (
+              <Link to="/login" className="landing-nav__link landing-nav__signin">
+                Sign in
+              </Link>
+            )}
             <ThemeToggle />
           </div>
         </div>
@@ -213,23 +199,20 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ── quick start ──────────────────────────────────────── */}
+        {/* ── get started ──────────────────────────────────────── */}
         <section className="landing-section">
           <h2 className="landing-section__title">
             <span className="landing-section__icon"><RocketIcon /></span>
-            Quick start
+            Get started
           </h2>
-          <div className="landing-code">
-            <div className="landing-code__bar">
-              <span className="mono-label">bash</span>
-              <button type="button" className="landing-code__copy" onClick={copy}>
-                <CopyIcon />
-                {copied ? "Copied" : "Copy"}
-              </button>
-            </div>
-            <pre className="landing-code__pre dark-scroll">
-              <code>{QUICK_START}</code>
-            </pre>
+          <div className="landing-getstarted card">
+            <p className="landing-getstarted__lede">
+              No install, no server to run. Sign in and start generating ideas or
+              analyzing a repository in seconds.
+            </p>
+            <Link to="/login" className="btn btn-primary landing-getstarted__cta">
+              Sign in to get started
+            </Link>
           </div>
         </section>
       </main>
@@ -240,9 +223,6 @@ export function LandingPage() {
           <span>Dev&#8209;Strom</span>
         </Link>
         <nav className="landing-footer__links">
-          <a href={GITHUB_URL} className="landing-nav__link" target="_blank" rel="noreferrer">
-            GitHub
-          </a>
           <Link to="/ideas" className="landing-nav__link">Ideas</Link>
           <Link to="/advisor" className="landing-nav__link">Repository Intelligence</Link>
         </nav>

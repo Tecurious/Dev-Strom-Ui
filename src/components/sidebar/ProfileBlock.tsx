@@ -1,17 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useDemoMode } from "../../hooks/useDemoMode";
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
+import { initials } from "../../lib/auth";
 
 export function ProfileBlock({ collapsed }: { collapsed: boolean }) {
   const { user, signOut } = useAuth();
   const { demoMode, forced, setDemoMode } = useDemoMode();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -64,6 +60,18 @@ export function ProfileBlock({ collapsed }: { collapsed: boolean }) {
             <span className="profile-block__name">{name}</span>
             <span className="profile-block__sub">{email}</span>
           </div>
+
+          <button
+            type="button"
+            className="profile-menu__row"
+            role="menuitem"
+            onClick={() => {
+              setMenuOpen(false);
+              navigate("/profile");
+            }}
+          >
+            <span>View profile</span>
+          </button>
 
           <button
             type="button"
