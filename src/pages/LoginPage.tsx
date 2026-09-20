@@ -46,7 +46,12 @@ export function LoginPage() {
   const error = params.get("error");
 
   useEffect(() => {
-    getProviders().then(setProviders);
+    // getProviders() returns [] on transport failure (e.g. 429) or [] on
+    // an empty provider list — either way the page renders one deterministic
+    // state instead of hanging on "Loading…" forever.
+    getProviders()
+      .then(setProviders)
+      .catch(() => setProviders([]));
   }, [getProviders]);
 
   if (status === "authenticated") {
