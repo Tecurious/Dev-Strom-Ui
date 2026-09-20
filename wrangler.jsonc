@@ -1,0 +1,7 @@
+{
+  "name": "dev-strom-ui",
+  "compatibility_date": "2026-09-18",
+  "assets": {
+    "directory": "./dist"
+  }
+}
