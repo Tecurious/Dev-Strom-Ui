@@ -10,6 +10,7 @@ import type {
 } from "../../api/types";
 import { ProjectGraphView } from "../graph/ProjectGraphView";
 import { MermaidDiagram } from "../graph/MermaidDiagram";
+import { ArchitectureDiagram } from "../graph/ArchitectureDiagram";
 import { EmptyState } from "../StateBlocks";
 import "./RepoIntelligence.css";
 
@@ -193,11 +194,18 @@ function ArchitectureTab({ analysis }: { analysis: Analysis }) {
         </div>
       )}
 
-      {mermaid && (
+      {analysis.archify ? (
         <div className="card">
           <span className="mono-label accent">System Diagram</span>
-          <MermaidDiagram source={mermaid} />
+          <ArchitectureDiagram runId={analysis.run_id} />
         </div>
+      ) : (
+        mermaid && (
+          <div className="card">
+            <span className="mono-label accent">System Diagram</span>
+            <MermaidDiagram source={mermaid} />
+          </div>
+        )
       )}
 
       {graph ? (

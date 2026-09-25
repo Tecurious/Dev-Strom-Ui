@@ -246,6 +246,7 @@ export interface Analysis {
   graph?: ProjectGraph | null;
   /** Optional architecture diagram (Mermaid) fallback. Additive; may be null. */
   mermaid?: string | null;
+  archify?: Record<string, unknown> | null;
 }
 
 export interface AnalyzeRequest {
