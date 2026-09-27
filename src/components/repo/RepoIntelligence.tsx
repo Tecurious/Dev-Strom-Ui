@@ -194,18 +194,27 @@ function ArchitectureTab({ analysis }: { analysis: Analysis }) {
         </div>
       )}
 
-      {analysis.archify ? (
+      {(analysis.archify || mermaid) && (
         <div className="card">
           <span className="mono-label accent">System Diagram</span>
-          <ArchitectureDiagram runId={analysis.run_id} />
+          {analysis.archify ? (
+            <ArchitectureDiagram
+              key={analysis.run_id}
+              runId={analysis.run_id}
+              repo={repoName(analysis)}
+              spec={analysis.archify}
+              fallback={
+                mermaid ? (
+                  <MermaidDiagram source={mermaid} />
+                ) : (
+                  <p className="repo-intel__muted">Diagram unavailable for this analysis.</p>
+                )
+              }
+            />
+          ) : (
+            mermaid && <MermaidDiagram source={mermaid} />
+          )}
         </div>
-      ) : (
-        mermaid && (
-          <div className="card">
-            <span className="mono-label accent">System Diagram</span>
-            <MermaidDiagram source={mermaid} />
-          </div>
-        )
       )}
 
       {graph ? (

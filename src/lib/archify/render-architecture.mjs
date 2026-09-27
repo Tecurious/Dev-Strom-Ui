@@ -1,7 +1,5 @@
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from './shared/utils.mjs';
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, svgAccessibleText, svgRootAttrs } from './shared/cli.mjs';
-import { applyTemplate, renderCards } from './shared/utils.mjs';
-import { componentBox, boundaryBox, connectionPath } from './shared/layout-report.mjs';
 import { throwDiagnosticProblems } from './shared/diagnostics.mjs';
 import { legendFootprint, relationshipLegendObstacles, resolveLegend, renderLegend as renderResolvedLegend } from './shared/legend.mjs';
 import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from './shared/text-fit.mjs';
@@ -31,7 +29,6 @@ import {
   chosenSide,
   routeHonorsEndpointSides,
   normalizeRoutePoints,
-  polylinePath,
   routePointsValue,
   roundedPath,
   labelPoint,
@@ -48,11 +45,9 @@ const componentTextFit = {
   tagMinimum: 6,
 };
 
-/* Browser vendor (tt-a1i/archify, MIT): input injected by the caller.
-   Expected shape: { diagram, template } — template is the skill's
-   assets/template.html. */
-const { diagram: arch, template, sourceEvidence = null } = globalThis.__ARCHIFY_INPUT__;
-const layoutJsonMode = false;
+/* Browser vendor (tt-a1i/archify, MIT): the upstream CLI script body wrapped
+   in a function so every call renders its own diagram SVG. */
+export function renderArchitecture({ diagram: arch, strict = false }) {
 
 const grid = gridLayout(arch);
 
@@ -331,28 +326,29 @@ const legendY = () => viewBox[1] - 16;
 // ---- Validation: mechanical correctness, never layout taste -----------------
 function validateArchitecture() {
   const problems = [];
+  const hard = [];
   if (resolvedBoundaryTitles.readabilityProblem) {
     problems.push(resolvedBoundaryTitles.readabilityProblem);
   }
   const requiresNestedBoundaryMembership = arch.meta?.engineering_profile === 'deployment-ownership';
-  if (components.size !== asArray(arch.components).length) problems.push('Component ids must be unique.');
+  if (components.size !== asArray(arch.components).length) hard.push('Component ids must be unique.');
   if (grid) {
-    validateGridPlacement(arch, grid, problems);
+    validateGridPlacement(arch, grid, hard);
   } else {
     for (const c of asArray(arch.components)) {
       if (!Array.isArray(c.pos) || c.pos.length !== 2) {
-        problems.push(`Component "${c.id}" must include pos [x, y] when layout.mode is omitted (free placement).`);
+        hard.push(`Component "${c.id}" must include pos [x, y] when layout.mode is omitted (free placement).`);
       }
     }
   }
 
   for (const c of components.values()) {
     if (!isFinitePoint(c.x, c.y, c.width, c.height)) {
-      problems.push(`Component "${c.id}" has non-finite pos/size — pos and size must be [number, number].`);
+      hard.push(`Component "${c.id}" has non-finite pos/size — pos and size must be [number, number].`);
       continue;
     }
     if (c.width <= 0 || c.height <= 0) {
-      problems.push(`Component "${c.id}" has invalid size ${c.width}x${c.height} — width and height must be greater than 0.`);
+      hard.push(`Component "${c.id}" has invalid size ${c.width}x${c.height} — width and height must be greater than 0.`);
       continue;
     }
     if (c.x < 0 || c.y < 0 || c.x + c.width > viewBox[0] || c.y + c.height > viewBox[1]) {
@@ -392,7 +388,7 @@ function validateArchitecture() {
   // Boundaries: every wrapped id must exist; the computed box must stay in view.
   for (const boundary of asArray(arch.boundaries)) {
     for (const id of asArray(boundary.wraps)) {
-      if (!components.has(id)) problems.push(`Boundary "${boundary.label}" wraps unknown component "${id}".`);
+      if (!components.has(id)) hard.push(`Boundary "${boundary.label}" wraps unknown component "${id}".`);
     }
   }
   const viewBoxRect = { x: 0, y: 0, width: viewBox[0], height: viewBox[1] };
@@ -491,8 +487,8 @@ function validateArchitecture() {
   }
 
   for (const conn of asArray(arch.connections)) {
-    if (!components.has(conn.from)) problems.push(`Connection "${conn.label || conn.from}" references unknown source "${conn.from}".`);
-    if (!components.has(conn.to)) problems.push(`Connection "${conn.label || conn.to}" references unknown target "${conn.to}".`);
+    if (!components.has(conn.from)) hard.push(`Connection "${conn.label || conn.from}" references unknown source "${conn.from}".`);
+    if (!components.has(conn.to)) hard.push(`Connection "${conn.label || conn.to}" references unknown target "${conn.to}".`);
     if (components.has(conn.from) && components.has(conn.to)) {
       const routed = pathFor(conn);
       const [start, end] = [routed.points[0], routed.points[routed.points.length - 1]];
@@ -591,44 +587,12 @@ function validateArchitecture() {
     profile: arch.meta?.quality_profile,
   }));
 
-  if (problems.length) {
-    throwDiagnosticProblems('Architecture layout validation failed', problems, {
+  if (hard.length || (strict && problems.length)) {
+    throwDiagnosticProblems('Architecture layout validation failed', [...hard, ...problems], {
       subject: { diagramType: 'architecture' },
     });
   }
-}
-
-function buildLayoutReport() {
-  const labels = [];
-  for (const conn of asArray(arch.connections)) {
-    if (!conn.label || !components.has(conn.from) || !components.has(conn.to)) continue;
-    const [lx, ly] = labelPoint(conn, pathFor(conn).points);
-    const w = Math.max(30, textUnits(conn.label) * 4.8 + 10);
-    labels.push({
-      text: conn.label,
-      x: Math.round(lx - w / 2),
-      y: Math.round(ly - 10),
-      width: Math.round(w),
-      height: 14,
-      labelAt: [Math.round(lx), Math.round(ly)],
-    });
-  }
-  return {
-    ok: true,
-    diagram_type: 'architecture',
-    layout: grid ? { mode: 'grid', ...grid } : { mode: 'free' },
-    viewBox,
-    components: [...components.values()].map(componentBox),
-    boundaries: boundaries.map(boundaryBox),
-    connections: asArray(arch.connections)
-      .filter((conn) => components.has(conn.from) && components.has(conn.to))
-      .map((conn) => {
-        const routed = pathFor(conn);
-        const labelAt = conn.label ? labelPoint(conn, routed.points) : null;
-        return connectionPath(conn, routed, labelAt);
-      }),
-    labels,
-  };
+  return problems;
 }
 
 // ---- Connection routing ------------------------------------------------------
@@ -1057,18 +1021,6 @@ ${renderLegend()}
       </svg>`;
 }
 
-validateArchitecture();
-const __svg = renderSvg();
-globalThis.__ARCHIFY_OUTPUT__ = {
-  svg: __svg,
-  html: applyTemplate(template, {
-    title: arch.meta?.title ?? 'Architecture',
-    subtitle: arch.meta?.subtitle,
-    svg: __svg,
-    cards: arch.cards,
-    locale: arch.meta?.locale,
-    visualPreset: arch.meta?.visual_preset || 'classic',
-    guidedViews: arch.meta?.views || [],
-    sourceEvidence,
-  }),
-};
+const warnings = validateArchitecture();
+return { warnings, svg: renderSvg() };
+}

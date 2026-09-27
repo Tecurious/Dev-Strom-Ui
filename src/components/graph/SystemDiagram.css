@@ -1,0 +1,157 @@
+.system-diagram {
+  position: relative;
+}
+
+.system-diagram__viewport {
+  height: 560px;
+  overflow: hidden;
+  background: var(--bg);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.system-diagram__viewport:active {
+  cursor: grabbing;
+}
+
+.system-diagram__content {
+  width: max-content;
+  transform-origin: 0 0;
+}
+
+.system-diagram__content svg {
+  display: block;
+}
+
+.system-diagram--present {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--bg);
+}
+
+.system-diagram--present .system-diagram__viewport {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.system-diagram__actions {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.system-diagram__button,
+.system-diagram__menu-item,
+.system-diagram__zoom button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: 500 12px var(--font-mono);
+  color: var(--ink-2);
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  cursor: pointer;
+}
+
+.system-diagram__button {
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.system-diagram__button:hover,
+.system-diagram__menu-item:hover,
+.system-diagram__zoom button:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
+.system-diagram__button:focus-visible,
+.system-diagram__menu-item:focus-visible,
+.system-diagram__zoom button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.system-diagram__button[aria-expanded="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.system-diagram__menu {
+  position: relative;
+}
+
+.system-diagram__menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 190px;
+  padding: var(--space-1);
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.system-diagram__menu-item {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+.system-diagram__zoom {
+  position: absolute;
+  left: var(--space-3);
+  bottom: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.system-diagram__zoom button {
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-bottom: var(--hairline) solid var(--border);
+}
+
+.system-diagram__zoom button:last-child {
+  border-bottom: 0;
+}
+
+.system-diagram__icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.system-diagram-svg [data-node-id],
+.system-diagram-svg [data-edge-key] {
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+.system-diagram--focus .system-diagram-svg [data-node-id],
+.system-diagram--focus .system-diagram-svg [data-edge-key] {
+  opacity: 0.22;
+}
