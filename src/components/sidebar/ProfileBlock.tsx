@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { useDemoMode } from "../../hooks/useDemoMode";
 import { initials } from "../../lib/auth";
+import { endImpersonation } from "../../lib/impersonation";
 
 export function ProfileBlock({ collapsed }: { collapsed: boolean }) {
   const { user, signOut } = useAuth();
-  const { demoMode, forced, setDemoMode } = useDemoMode();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const impersonating = !!user?.impersonator;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -73,22 +73,21 @@ export function ProfileBlock({ collapsed }: { collapsed: boolean }) {
             <span>View profile</span>
           </button>
 
-          <button
-            type="button"
-            className="profile-menu__row"
-            role="menuitemcheckbox"
-            aria-checked={demoMode}
-            onClick={() => !forced && setDemoMode(!demoMode)}
-            disabled={forced}
-            title={forced ? "Forced on via VITE_DEMO_MODE" : undefined}
-          >
-            <span>Demo mode</span>
-            <span className={"profile-menu__pill" + (demoMode ? " is-on" : "")}>
-              {demoMode ? "On" : "Off"}
-            </span>
-          </button>
-
           <div className="profile-menu__divider" />
+
+          {impersonating && (
+            <button
+              type="button"
+              className="profile-menu__row"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                void endImpersonation().catch(() => undefined);
+              }}
+            >
+              <span>Back to admin</span>
+            </button>
+          )}
 
           <button
             type="button"

@@ -65,7 +65,13 @@ export function AdminPage() {
   };
 
   const handleImpersonate = async (u: AdminUser) => {
-    if (!window.confirm(`View the app as ${u.email}? You can stop from the banner.`)) return;
+    if (
+      !window.confirm(
+        `View the app as ${u.email}?\n\nThis is not anonymous mode — you use their signed-in account. Use “Back to admin” on the orange banner (or the profile menu) to return.`,
+      )
+    ) {
+      return;
+    }
     const ok = await runImpersonate(u.id);
     if (ok) {
       await refreshAuth();

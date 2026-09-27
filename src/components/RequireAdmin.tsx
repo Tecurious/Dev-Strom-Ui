@@ -1,18 +1,18 @@
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { isAdminActor } from "../lib/auth";
 
-/** Gate for /admin: renders children only for an admin role, otherwise
- *  bounces to /ideas — the visitor is already authenticated (this sits
- *  inside RequireAuth), just not authorized, so /login would be wrong.
+/** Gate for /admin: renders children for an admin, or while an admin is
+ *  viewing as another user (so they can open the dashboard / exit).
+ *  Otherwise bounces to /ideas — already authenticated (inside RequireAuth),
+ *  so /login would be wrong.
  *
- *  This is UX only. The real boundary is server-side: every /admin/* call
- *  is independently gated by require_admin, so a non-admin hitting the URL
- *  directly still gets 403s from the API even if this guard were bypassed. */
+ *  UX only. Server-side require_admin is the real boundary. */
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { user } = useAuth();
 
-  if (user?.role !== "admin") {
+  if (!isAdminActor(user)) {
     return <Navigate to="/ideas" replace />;
   }
 

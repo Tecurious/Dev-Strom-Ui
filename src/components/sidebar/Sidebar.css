@@ -310,24 +310,6 @@
   color: var(--ink-3);
 }
 
-.profile-menu__pill {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 2px var(--space-2);
-  border-radius: 999px;
-  border: var(--hairline) solid var(--border);
-  color: var(--ink-3);
-}
-
-.profile-menu__pill.is-on {
-  color: var(--accent);
-  border-color: var(--accent-soft);
-  background: var(--accent-wash);
-}
-
 .profile-menu__divider {
   height: var(--hairline);
   background: var(--border-soft);

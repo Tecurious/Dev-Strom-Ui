@@ -30,6 +30,11 @@ export function initials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/** True for an admin, or while an admin is viewing as another user (`impersonator`). */
+export function isAdminActor(user: AuthUser | null | undefined): boolean {
+  return user?.role === "admin" || !!user?.impersonator;
+}
+
 export type AuthState =
   | { status: "loading"; user: null }
   | { status: "authenticated"; user: AuthUser }
