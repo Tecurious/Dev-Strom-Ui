@@ -1,0 +1,313 @@
+{
+  "prod-sun-mmon-puzzle": {
+    "schema_version": 1,
+    "diagram_type": "architecture",
+    "meta": {
+      "title": "System architecture"
+    },
+    "layout": {
+      "mode": "grid",
+      "cols": 2,
+      "origin": [
+        40,
+        80
+      ],
+      "cellW": 130,
+      "cellH": 64,
+      "gapX": 99,
+      "gapY": 72
+    },
+    "components": [
+      {
+        "id": "user",
+        "type": "external",
+        "label": "User",
+        "sublabel": "browser client",
+        "row": 0,
+        "col": 0
+      },
+      {
+        "id": "spa",
+        "type": "frontend",
+        "label": "React SPA",
+        "sublabel": "Vite + TypeScript + Tailwind",
+        "row": 0,
+        "col": 1
+      },
+      {
+        "id": "assets",
+        "type": "frontend",
+        "label": "Assets",
+        "sublabel": "static resources",
+        "row": 1,
+        "col": 1
+      },
+      {
+        "id": "vite",
+        "type": "cloud",
+        "label": "Build Toolchain",
+        "sublabel": "Vite / PostCSS",
+        "row": 1,
+        "col": 0
+      }
+    ],
+    "connections": [
+      {
+        "from": "user",
+        "to": "spa",
+        "label": "HTTPS",
+        "variant": "emphasis"
+      },
+      {
+        "from": "spa",
+        "to": "assets",
+        "label": "static fetch",
+        "variant": "default",
+        "labelDy": 24
+      },
+      {
+        "from": "vite",
+        "to": "spa",
+        "label": "bundle",
+        "variant": "dashed",
+        "fromSide": "top",
+        "toSide": "top",
+        "via": [
+          [
+            100.0,
+            178.0
+          ],
+          [
+            214.5,
+            178.0
+          ],
+          [
+            214.5,
+            42.0
+          ],
+          [
+            329.0,
+            42.0
+          ]
+        ]
+      }
+    ],
+    "boundaries": [
+      {
+        "kind": "security-group",
+        "label": "Browser trust boundary",
+        "wraps": [
+          "spa",
+          "assets"
+        ]
+      }
+    ]
+  },
+  "prompt-example": {
+    "schema_version": 1,
+    "diagram_type": "architecture",
+    "meta": {
+      "title": "System"
+    },
+    "layout": {
+      "mode": "grid",
+      "cols": 2,
+      "origin": [
+        40,
+        80
+      ],
+      "cellW": 130,
+      "cellH": 64,
+      "gapX": 66,
+      "gapY": 72
+    },
+    "components": [
+      {
+        "id": "web",
+        "type": "frontend",
+        "label": "Web UI",
+        "row": 0,
+        "col": 0
+      },
+      {
+        "id": "api",
+        "type": "backend",
+        "label": "API",
+        "row": 0,
+        "col": 1
+      },
+      {
+        "id": "db",
+        "type": "database",
+        "label": "Postgres",
+        "row": 1,
+        "col": 0
+      }
+    ],
+    "connections": [
+      {
+        "from": "web",
+        "to": "api",
+        "label": "HTTPS",
+        "variant": "emphasis"
+      }
+    ],
+    "boundaries": [
+      {
+        "kind": "security-group",
+        "label": "Trust",
+        "wraps": [
+          "api",
+          "db"
+        ]
+      }
+    ]
+  },
+  "corridors-and-long-labels": {
+    "schema_version": 1,
+    "diagram_type": "architecture",
+    "meta": {
+      "title": "System"
+    },
+    "layout": {
+      "mode": "grid",
+      "cols": 3,
+      "origin": [
+        40,
+        80
+      ],
+      "cellW": 200,
+      "cellH": 64,
+      "gapX": 109,
+      "gapY": 72
+    },
+    "components": [
+      {
+        "id": "a",
+        "type": "frontend",
+        "label": "Web UI",
+        "row": 0,
+        "col": 0,
+        "size": [
+          190,
+          60
+        ]
+      },
+      {
+        "id": "b",
+        "type": "backend",
+        "label": "Authentication Service Gateway",
+        "sublabel": "Celery workers on Redis broker",
+        "row": 1,
+        "col": 0,
+        "size": [
+          190,
+          60
+        ]
+      },
+      {
+        "id": "c",
+        "type": "database",
+        "label": "Postgres",
+        "row": 2,
+        "col": 0,
+        "size": [
+          190,
+          60
+        ]
+      },
+      {
+        "id": "d",
+        "type": "messagebus",
+        "label": "Kafka",
+        "row": 1,
+        "col": 1,
+        "size": [
+          190,
+          60
+        ]
+      },
+      {
+        "id": "e",
+        "type": "external",
+        "label": "Stripe",
+        "row": 0,
+        "col": 2,
+        "size": [
+          190,
+          60
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "from": "a",
+        "to": "c",
+        "label": "reads/writes",
+        "variant": "default",
+        "fromSide": "left",
+        "toSide": "left",
+        "via": [
+          [
+            -19.5,
+            110.0
+          ],
+          [
+            -19.5,
+            382.0
+          ]
+        ]
+      },
+      {
+        "from": "a",
+        "to": "b",
+        "label": "OAuth2",
+        "variant": "default",
+        "labelDy": 24
+      },
+      {
+        "from": "e",
+        "to": "a",
+        "label": "webhooks",
+        "variant": "default"
+      },
+      {
+        "from": "b",
+        "to": "d",
+        "label": "publish events",
+        "variant": "default"
+      },
+      {
+        "from": "e",
+        "to": "c",
+        "variant": "dashed",
+        "fromSide": "bottom",
+        "toSide": "right",
+        "via": [
+          [
+            753.0,
+            178.0
+          ],
+          [
+            289.5,
+            178.0
+          ],
+          [
+            289.5,
+            382.0
+          ]
+        ]
+      }
+    ],
+    "boundaries": [
+      {
+        "kind": "region",
+        "label": "Core",
+        "wraps": [
+          "b",
+          "c"
+        ]
+      }
+    ]
+  }
+}

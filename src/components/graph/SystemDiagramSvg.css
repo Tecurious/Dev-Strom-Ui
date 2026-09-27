@@ -1,0 +1,61 @@
+/* Drawing styles for the rendered system diagram SVG. Loaded on the page and
+   also embedded (with tokens resolved) into exported images, so every rule is
+   scoped to the SVG root and only reads design tokens. */
+
+.system-diagram-svg text { font-family: var(--font-mono); }
+
+.system-diagram-svg .c-grid { stroke: var(--border-soft); fill: none; }
+.system-diagram-svg .c-mask { fill: var(--bg); stroke: none; }
+
+.system-diagram-svg .c-frontend   { fill: color-mix(in srgb, var(--info) 14%, var(--bg));       stroke: var(--info); }
+.system-diagram-svg .c-backend    { fill: color-mix(in srgb, var(--ok) 14%, var(--bg));         stroke: var(--ok); }
+.system-diagram-svg .c-database   { fill: color-mix(in srgb, var(--node-class) 14%, var(--bg)); stroke: var(--node-class); }
+.system-diagram-svg .c-cloud      { fill: color-mix(in srgb, var(--sev-medium) 14%, var(--bg)); stroke: var(--sev-medium); }
+.system-diagram-svg .c-security   { fill: color-mix(in srgb, var(--danger) 14%, var(--bg));     stroke: var(--danger); }
+.system-diagram-svg .c-messagebus { fill: color-mix(in srgb, var(--warn) 14%, var(--bg));       stroke: var(--warn); }
+.system-diagram-svg .c-external   { fill: color-mix(in srgb, var(--ink-3) 14%, var(--bg));      stroke: var(--ink-3); }
+
+.system-diagram-svg .c-security-group { fill: transparent; stroke: var(--danger); stroke-dasharray: 4, 4; }
+.system-diagram-svg .c-region { fill: color-mix(in srgb, var(--sev-medium) 5%, transparent); stroke: var(--sev-medium); stroke-dasharray: 8, 4; }
+
+.system-diagram-svg .t-primary    { fill: var(--ink); }
+.system-diagram-svg .t-muted      { fill: var(--ink-2); }
+.system-diagram-svg .t-dim        { fill: var(--ink-3); }
+.system-diagram-svg .t-frontend   { fill: var(--info); }
+.system-diagram-svg .t-backend    { fill: var(--ok); }
+.system-diagram-svg .t-database   { fill: var(--node-class); }
+.system-diagram-svg .t-cloud      { fill: var(--sev-medium); }
+.system-diagram-svg .t-security   { fill: var(--danger); }
+.system-diagram-svg .t-messagebus { fill: var(--warn); }
+.system-diagram-svg .t-external   { fill: var(--ink-3); }
+
+/* Relationship labels: emphasis reads copper, dashed reads as quiet ink. */
+.system-diagram-svg [data-detail="context"] .t-backend    { fill: var(--accent); }
+.system-diagram-svg [data-detail="context"] .t-messagebus { fill: var(--ink-2); }
+
+.system-diagram-svg .semantic-sigil {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.76;
+}
+.system-diagram-svg .semantic-sigil > * { vector-effect: non-scaling-stroke; }
+.system-diagram-svg .semantic-sigil .sigil-fill { fill: currentColor; stroke: none; }
+.system-diagram-svg .s-frontend   { color: var(--info); }
+.system-diagram-svg .s-backend    { color: var(--ok); }
+.system-diagram-svg .s-database   { color: var(--node-class); }
+.system-diagram-svg .s-cloud      { color: var(--sev-medium); }
+.system-diagram-svg .s-security   { color: var(--danger); }
+.system-diagram-svg .s-messagebus { color: var(--warn); }
+.system-diagram-svg .s-external   { color: var(--ink-3); }
+
+.system-diagram-svg .a-default  { stroke: var(--ink-3); fill: none; }
+.system-diagram-svg .a-emphasis { stroke: var(--accent); fill: none; }
+.system-diagram-svg .a-security { stroke: var(--danger); fill: none; stroke-dasharray: 5, 5; }
+.system-diagram-svg .a-dashed   { stroke: var(--ink-3); fill: none; stroke-dasharray: 4, 4; }
+.system-diagram-svg .m-default  { fill: var(--ink-3); }
+.system-diagram-svg .m-emphasis { fill: var(--accent); }
+.system-diagram-svg .m-security { fill: var(--danger); }
+.system-diagram-svg .m-dashed   { fill: var(--ink-3); }

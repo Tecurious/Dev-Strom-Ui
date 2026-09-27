@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "System architecture",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    {
+      "id": "user",
+      "col": 0,
+      "row": 0,
+      "type": "external",
+      "label": "User",
+      "sublabel": "browser client"
+    },
+    {
+      "id": "spa",
+      "col": 1,
+      "row": 0,
+      "type": "frontend",
+      "label": "React SPA",
+      "sublabel": "Vite + TypeScript + Tailwind"
+    },
+    {
+      "id": "assets",
+      "col": 1,
+      "row": 1,
+      "type": "frontend",
+      "label": "Assets",
+      "sublabel": "static resources"
+    },
+    {
+      "id": "vite",
+      "col": 0,
+      "row": 1,
+      "type": "cloud",
+      "label": "Build Toolchain",
+      "sublabel": "Vite / PostCSS"
+    }
+  ],
+  "connections": [
+    {
+      "to": "spa",
+      "from": "user",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "to": "assets",
+      "from": "spa",
+      "label": "static fetch",
+      "variant": "default"
+    },
+    {
+      "to": "spa",
+      "from": "vite",
+      "label": "bundle",
+      "variant": "dashed"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "Browser trust boundary",
+      "wraps": [
+        "spa",
+        "assets"
+      ]
+    }
+  ]
+}
