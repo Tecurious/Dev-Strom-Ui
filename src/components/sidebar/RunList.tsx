@@ -3,6 +3,7 @@ import { Link, useMatch } from "react-router-dom";
 import { EmptyState, ErrorState, LoadingState } from "../StateBlocks";
 import { useRuns } from "../../hooks/useRuns";
 import { useSidebar } from "../../hooks/useSidebar";
+import { shortRunTitle } from "../../lib/runTitle";
 import type { RunGroup } from "../../lib/sidebar";
 import type { AnalysisSummary, HistoryRun } from "../../api/types";
 
@@ -166,7 +167,7 @@ export function RunList() {
               to={`/history/${run.run_id}`}
               active={run.run_id === activeIdea}
               glyph={<IdeaGlyph />}
-              title={run.tech_stack || run.run_id}
+              title={shortRunTitle(run.tech_stack, run.run_id)}
               meta={relativeTime(run.created_at)}
             />
           ))}

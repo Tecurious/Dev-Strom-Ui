@@ -65,7 +65,7 @@ export function IdeaCard({ idea, runId }: { idea: Idea; runId: string }) {
 
       <p className="idea-card__label mono-label">Why It's Interesting</p>
       <ul>
-        {idea.why_it_fits.map((point, i) => (
+        {(idea.why_it_fits ?? []).map((point, i) => (
           <li key={i}>{point}</li>
         ))}
       </ul>

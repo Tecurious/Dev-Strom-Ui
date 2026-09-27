@@ -2,14 +2,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getRun } from "../api/history";
 import { IdeaCard } from "../components/IdeaCard";
 import { SectionMarker } from "../components/SectionMarker";
-import { ErrorState, LoadingState } from "../components/StateBlocks";
+import { EmptyState, ErrorState, LoadingState } from "../components/StateBlocks";
 import { useAsyncData } from "../hooks/useAsyncData";
+import { shortRunTitle } from "../lib/runTitle";
 import "./RunDetailPage.css";
 
 export function RunDetailPage() {
   const { runId = "" } = useParams();
   const navigate = useNavigate();
   const state = useAsyncData(() => getRun(runId), [runId]);
+  const ideas = state.status === "success" && Array.isArray(state.data.ideas) ? state.data.ideas : [];
 
   return (
     <div className="run-detail-page">
@@ -22,7 +24,7 @@ export function RunDetailPage() {
       </button>
       <SectionMarker label="Run Detail" />
       <h1 className="run-detail-page__title">
-        {state.status === "success" ? state.data.tech_stack : runId}
+        {state.status === "success" ? shortRunTitle(state.data.tech_stack, runId) : runId}
       </h1>
 
       {state.status === "loading" && <LoadingState label="Loading run" />}
@@ -31,7 +33,7 @@ export function RunDetailPage() {
       {state.status === "success" && (
         <>
           <div className="card run-detail-page__meta">
-            <div>
+            <div className="run-detail-page__intent">
               <span className="mono-label">Intent</span>
               <p>{state.data.tech_stack}</p>
             </div>
@@ -41,12 +43,14 @@ export function RunDetailPage() {
             </div>
           </div>
 
-          {Array.isArray(state.data.ideas) && state.data.ideas.length > 0 && (
+          {ideas.length > 0 ? (
             <div className="ideas-grid">
-              {state.data.ideas.map((idea) => (
+              {ideas.map((idea) => (
                 <IdeaCard key={idea.pid} idea={idea} runId={runId} />
               ))}
             </div>
+          ) : (
+            <EmptyState message="No ideas were saved for this run." />
           )}
         </>
       )}
