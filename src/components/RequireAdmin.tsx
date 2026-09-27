@@ -1,18 +1,23 @@
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { isAdminActor } from "../lib/auth";
 
-/** Gate for /admin: renders children for an admin, or while an admin is
- *  viewing as another user (so they can open the dashboard / exit).
- *  Otherwise bounces to /ideas — already authenticated (inside RequireAuth),
- *  so /login would be wrong.
+/** Gate for /admin: only the admin's own session.
  *
- *  UX only. Server-side require_admin is the real boundary. */
+ *  While "viewing as" another user, bounce to /ideas — the point of
+ *  impersonation is to see the app as they do, not keep the dashboard.
+ *  Return via the banner / profile "Back to admin".
+ *
+ *  UX only. Server-side require_admin still allows the impersonator for
+ *  stop-impersonate and break-glass; the UI simply doesn't show the dash.
+ */
 export function RequireAdmin({ children }: { children: ReactNode }) {
   const { user } = useAuth();
 
-  if (!isAdminActor(user)) {
+  if (user?.impersonator) {
+    return <Navigate to="/ideas" replace />;
+  }
+  if (user?.role !== "admin") {
     return <Navigate to="/ideas" replace />;
   }
 

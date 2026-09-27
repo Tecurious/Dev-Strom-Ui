@@ -16,7 +16,6 @@ import { EmptyState, ErrorState, LoadingState } from "../components/StateBlocks"
 import { useAsyncAction } from "../hooks/useAsyncAction";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { useAuth } from "../hooks/useAuth";
-import { refreshAuth } from "../lib/auth";
 import "./RunDetailPage.css";
 import "./AdminPage.css";
 
@@ -67,15 +66,15 @@ export function AdminPage() {
   const handleImpersonate = async (u: AdminUser) => {
     if (
       !window.confirm(
-        `View the app as ${u.email}?\n\nThis is not anonymous mode — you use their signed-in account. Use “Back to admin” on the orange banner (or the profile menu) to return.`,
+        `View the app as ${u.email}?\n\nYou'll leave Admin and use their account. Use “Back to admin” on the orange banner (or the profile menu) to return.`,
       )
     ) {
       return;
     }
     const ok = await runImpersonate(u.id);
     if (ok) {
-      await refreshAuth();
-      navigate("/ideas");
+      // Full navigation so Admin unmounts and we land in their app view.
+      window.location.assign("/ideas");
     }
   };
 

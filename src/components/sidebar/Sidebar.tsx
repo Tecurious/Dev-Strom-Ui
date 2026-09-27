@@ -3,7 +3,6 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useIdeaGeneration } from "../../hooks/useIdeaGeneration";
 import { useSidebar } from "../../hooks/useSidebar";
-import { isAdminActor } from "../../lib/auth";
 import { ProfileBlock } from "./ProfileBlock";
 import { RunList } from "./RunList";
 import "./Sidebar.css";
@@ -89,12 +88,12 @@ export function Sidebar() {
           ))}
         </nav>
 
-        {isAdminActor(user) && (
+        {user?.role === "admin" && !user.impersonator && (
           <nav className="sidebar__actions">
             <NavLink
               to="/admin"
               className={({ isActive }) => "sidebar__action" + (isActive ? " is-active" : "")}
-              title={user?.impersonator ? "Admin (viewing as another user)" : "Admin"}
+              title="Admin"
             >
               <span className="sidebar__action-icon">
                 <ShieldIcon />
