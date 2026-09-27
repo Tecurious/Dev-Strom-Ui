@@ -20,6 +20,13 @@
   max-width: 52rem;
 }
 
+.run-detail-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
 .run-detail-page__meta {
   display: grid;
   grid-template-columns: 1fr auto;
