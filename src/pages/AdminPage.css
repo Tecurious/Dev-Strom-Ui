@@ -80,6 +80,7 @@
 
 .admin-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.85rem;
 }
@@ -88,8 +89,11 @@
 .admin-table td {
   padding: var(--space-3) var(--space-4);
   text-align: left;
-  white-space: nowrap;
   border-bottom: var(--hairline) solid var(--border-soft);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .admin-table th {
@@ -105,12 +109,37 @@
   border-bottom: none;
 }
 
+/* Column shares for the requests table (5 cols). People table has 6 — still ok. */
+.admin-table th:nth-child(1),
+.admin-table td:nth-child(1) {
+  width: 18%;
+}
+.admin-table th:nth-child(2),
+.admin-table td:nth-child(2) {
+  width: 8%;
+}
+.admin-table th:nth-child(3),
+.admin-table td:nth-child(3) {
+  width: 42%;
+}
+.admin-table th:nth-child(4),
+.admin-table td:nth-child(4) {
+  width: 16%;
+}
+.admin-table th:nth-child(5),
+.admin-table td:nth-child(5) {
+  width: 16%;
+}
+
 .admin-table__summary {
-  white-space: normal;
-  max-width: 36ch;
+  max-width: 0; /* with table-layout:fixed, forces the cell to honor column width */
 }
 
 .admin-table__link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--ink);
   text-decoration: underline;
   text-underline-offset: 0.15em;
@@ -124,6 +153,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  white-space: normal;
+  overflow: visible;
 }
 
 .admin-page__pager {

@@ -161,7 +161,11 @@ export function AdminPage() {
                       <td>{r.email ?? "—"}</td>
                       <td>{r.kind}</td>
                       <td className="admin-table__summary">
-                        <Link to={requestHref(r)} className="admin-table__link">
+                        <Link
+                          to={requestHref(r)}
+                          className="admin-table__link"
+                          title={r.summary ?? r.run_id}
+                        >
                           {r.summary ?? r.run_id}
                         </Link>
                       </td>
@@ -220,8 +224,8 @@ export function AdminPage() {
                   const isSelf = u.id === me?.id;
                   return (
                     <tr key={u.id}>
-                      <td>{u.email}</td>
-                      <td>{u.name ?? "—"}</td>
+                      <td title={u.email}>{u.email}</td>
+                      <td title={u.name ?? undefined}>{u.name ?? "—"}</td>
                       <td>{u.role}</td>
                       <td>{u.is_active ? "Active" : "Deactivated"}</td>
                       <td>{new Date(u.created_at).toLocaleDateString()}</td>
