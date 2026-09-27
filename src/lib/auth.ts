@@ -15,6 +15,11 @@ export interface AuthUser {
   auth_provider: string;
   /** ISO timestamp; null for the anonymous fallback user (AUTH_ENABLED=false). */
   created_at: string | null;
+  /** RBAC role — "system" only for the anonymous fallback user. */
+  role: "user" | "admin" | "system";
+  is_active: boolean;
+  /** Present when an admin is viewing the app as this user. */
+  impersonator?: { id: string; email: string; name: string | null } | null;
 }
 
 /** Avatar-fallback initials from a display name, e.g. "Ada Lovelace" -> "AL". */

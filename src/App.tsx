@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
+import { RequireAdmin } from "./components/RequireAdmin";
 import { RequireAuth } from "./components/RequireAuth";
 import { LoadingState } from "./components/StateBlocks";
 import { refreshAuth } from "./lib/auth";
@@ -22,9 +23,12 @@ const AnalysisDetailPage = lazy(() =>
 const ProfilePage = lazy(() =>
   import("./pages/ProfilePage").then((m) => ({ default: m.ProfilePage })),
 );
+const AdminPage = lazy(() => import("./pages/AdminPage").then((m) => ({ default: m.AdminPage })));
 
 function isKnownAppPath(pathname: string): boolean {
-  if (pathname === "/ideas" || pathname === "/advisor" || pathname === "/profile") return true;
+  if (pathname === "/ideas" || pathname === "/advisor" || pathname === "/profile" || pathname === "/admin") {
+    return true;
+  }
   return /^\/history\/[^/]+$/.test(pathname) || /^\/analysis\/[^/]+$/.test(pathname);
 }
 
@@ -53,6 +57,14 @@ function AppRoutes() {
         <Route path="/history/:runId" element={<RunDetailPage />} />
         <Route path="/analysis/:runId" element={<AnalysisDetailPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminPage />
+            </RequireAdmin>
+          }
+        />
       </Routes>
     </>
   );

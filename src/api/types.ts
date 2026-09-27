@@ -271,6 +271,48 @@ export interface AnalysisHistoryResponse {
   offset: number;
 }
 
+// ── Admin (RBAC dashboard) ──────────────────────────────────────────────────
+
+export interface AdminStats {
+  total_users: number;
+  runs_today: number;
+  analyses_today: number;
+  jobs_pending: number;
+  jobs_running: number;
+  jobs_failed: number;
+}
+
+/** One row in the merged idea-run + analysis feed (GET /admin/requests). */
+export interface AdminRequest {
+  run_id: string;
+  user_id: string | null;
+  email: string | null;
+  kind: "idea" | "analysis";
+  summary: string | null;
+  created_at: string;
+}
+
+export interface AdminRequestsResponse {
+  requests: AdminRequest[];
+  limit: number;
+  offset: number;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  name: string | null;
+  role: "user" | "admin" | "system";
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  limit: number;
+  offset: number;
+}
+
 // ── Health ───────────────────────────────────────────────────────────────
 
 export interface HealthResponse {
