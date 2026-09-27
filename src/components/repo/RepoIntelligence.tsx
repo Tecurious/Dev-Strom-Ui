@@ -8,7 +8,6 @@ import type {
   ImpactLevel,
   Severity,
 } from "../../api/types";
-import { ProjectGraphView } from "../graph/ProjectGraphView";
 import { MermaidDiagram } from "../graph/MermaidDiagram";
 import { ArchitectureDiagram } from "../graph/ArchitectureDiagram";
 import { EmptyState } from "../StateBlocks";
@@ -217,17 +216,9 @@ function ArchitectureTab({ analysis }: { analysis: Analysis }) {
         </div>
       )}
 
-      {graph ? (
-        <div className="repo-intel__structural">
-          <span className="mono-label accent">Service Map</span>
-          <p className="repo-intel__muted">
-            Services, integrations, and entrypoints — not individual classes or files.
-          </p>
-          <ProjectGraphView graph={graph} />
-        </div>
-      ) : !mermaid ? (
+      {!analysis.archify && !mermaid && (
         <EmptyState message="No architecture diagram was produced for this run." />
-      ) : null}
+      )}
 
       <div className="card">
         <span className="mono-label accent">Entrypoints</span>
