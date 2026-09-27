@@ -3,7 +3,6 @@ import type {
   Analysis,
   AnalysisFinding,
   AnalysisRecommendation,
-  Dependency,
   Evidence,
   ImpactLevel,
   Severity,
@@ -11,6 +10,7 @@ import type {
 import { MermaidDiagram } from "../graph/MermaidDiagram";
 import { ArchitectureDiagram } from "../graph/ArchitectureDiagram";
 import { EmptyState } from "../StateBlocks";
+import { groupDependencies } from "../../lib/dependencyRoles";
 import "./RepoIntelligence.css";
 
 type Tab = "overview" | "architecture" | "design" | "improvements";
@@ -168,15 +168,7 @@ function SeveritySummary({ findings }: { findings: AnalysisFinding[] }) {
 function ArchitectureTab({ analysis }: { analysis: Analysis }) {
   const { repository: repo, graph, mermaid } = analysis;
   const patterns = (graph?.stats?.architecture_patterns as string[] | undefined) ?? [];
-  const byEcosystem = useMemo(() => {
-    const map = new Map<string, Dependency[]>();
-    for (const d of repo.dependencies) {
-      const list = map.get(d.ecosystem) ?? [];
-      list.push(d);
-      map.set(d.ecosystem, list);
-    }
-    return Array.from(map.entries());
-  }, [repo.dependencies]);
+  const dependencies = useMemo(() => groupDependencies(analysis), [analysis]);
 
   return (
     <div className="repo-intel__architecture">
@@ -235,10 +227,10 @@ function ArchitectureTab({ analysis }: { analysis: Analysis }) {
 
       <div className="card">
         <span className="mono-label accent">Dependencies</span>
-        {byEcosystem.length === 0 && <p className="repo-intel__muted">No dependencies detected.</p>}
-        {byEcosystem.map(([eco, deps]) => (
-          <div key={eco} className="repo-intel__eco">
-            <span className="mono-label">{eco}</span>
+        {dependencies.groups.length === 0 && <p className="repo-intel__muted">No dependencies detected.</p>}
+        {dependencies.groups.map(({ role, deps }) => (
+          <div key={role} className="repo-intel__eco">
+            <span className="mono-label">{role}</span>
             <div className="repo-intel__deps">
               {deps.map((d) => (
                 <span key={d.name} className="badge badge-outline" title={d.source}>
@@ -249,6 +241,11 @@ function ArchitectureTab({ analysis }: { analysis: Analysis }) {
             </div>
           </div>
         ))}
+        {dependencies.hidden > 0 && (
+          <p className="repo-intel__muted">
+            {dependencies.hidden} standard-library and in-repo imports not shown.
+          </p>
+        )}
       </div>
     </div>
   );
