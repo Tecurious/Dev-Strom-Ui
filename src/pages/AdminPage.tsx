@@ -119,46 +119,61 @@ export function AdminPage() {
         </div>
       )}
 
-      <div className="admin-page__section-head">
-        <h2 className="admin-page__section-title">All requests</h2>
-        <div className="admin-page__filters" role="group" aria-label="Filter by kind">
-          {(["all", "idea", "analysis"] as const).map((k) => (
-            <button
-              key={k}
-              type="button"
-              className={"admin-filter" + (kind === k ? " is-active" : "")}
-              onClick={() => {
-                setKind(k);
-                setRequestPage(0);
-              }}
-            >
-              {k === "all" ? "All" : k === "idea" ? "Ideas" : "Analyses"}
-            </button>
-          ))}
+      <section className="admin-panel" aria-labelledby="admin-requests-heading">
+        <div className="admin-panel__head">
+          <h2 id="admin-requests-heading" className="admin-panel__title">
+            All requests
+          </h2>
+          <div className="admin-panel__filters" role="group" aria-label="Filter by kind">
+            {(["all", "idea", "analysis"] as const).map((k) => (
+              <button
+                key={k}
+                type="button"
+                className={"admin-filter" + (kind === k ? " is-active" : "")}
+                onClick={() => {
+                  setKind(k);
+                  setRequestPage(0);
+                }}
+              >
+                {k === "all" ? "All" : k === "idea" ? "Ideas" : "Analyses"}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-      {requests.status === "loading" && <LoadingState label="Loading requests" />}
-      {requests.status === "error" && <ErrorState message={requests.error} onRetry={requests.reload} />}
-      {requests.status === "success" && (
-        <>
-          {requests.data.requests.length === 0 ? (
+        {requests.status === "loading" && (
+          <div className="admin-panel__empty">
+            <LoadingState label="Loading requests" />
+          </div>
+        )}
+        {requests.status === "error" && (
+          <div className="admin-panel__empty">
+            <ErrorState message={requests.error} onRetry={requests.reload} />
+          </div>
+        )}
+        {requests.status === "success" && requests.data.requests.length === 0 && (
+          <div className="admin-panel__empty">
             <EmptyState message="No requests yet." />
-          ) : (
-            <div className="admin-table-wrap">
-              <table className="admin-table">
+          </div>
+        )}
+        {requests.status === "success" && requests.data.requests.length > 0 && (
+          <>
+            <div className="admin-panel__body">
+              <table className="admin-table admin-table--requests">
                 <thead>
                   <tr>
-                    <th>User</th>
-                    <th>Kind</th>
-                    <th>Summary</th>
-                    <th>Created</th>
-                    <th />
+                    <th scope="col">User</th>
+                    <th scope="col">Kind</th>
+                    <th scope="col">Summary</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {requests.data.requests.map((r) => (
                     <tr key={`${r.kind}-${r.run_id}`}>
-                      <td>{r.email ?? "—"}</td>
+                      <td title={r.email ?? undefined}>{r.email ?? "—"}</td>
                       <td>{r.kind}</td>
                       <td className="admin-table__summary">
                         <Link
@@ -170,7 +185,7 @@ export function AdminPage() {
                         </Link>
                       </td>
                       <td>{new Date(r.created_at).toLocaleString()}</td>
-                      <td>
+                      <td className="admin-table__actions">
                         <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleDelete(r)}>
                           Delete
                         </button>
@@ -180,121 +195,137 @@ export function AdminPage() {
                 </tbody>
               </table>
             </div>
-          )}
-          <div className="admin-page__pager">
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              disabled={requestPage === 0}
-              onClick={() => setRequestPage((p) => p - 1)}
-            >
-              &larr; Newer
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              disabled={requests.data.requests.length < PAGE_SIZE}
-              onClick={() => setRequestPage((p) => p + 1)}
-            >
-              Older &rarr;
-            </button>
-          </div>
-        </>
-      )}
+            <div className="admin-panel__foot">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={requestPage === 0}
+                onClick={() => setRequestPage((p) => p - 1)}
+              >
+                &larr; Newer
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={requests.data.requests.length < PAGE_SIZE}
+                onClick={() => setRequestPage((p) => p + 1)}
+              >
+                Older &rarr;
+              </button>
+            </div>
+          </>
+        )}
+      </section>
 
-      <h2 className="admin-page__section-title">People</h2>
-      {users.status === "loading" && <LoadingState label="Loading users" />}
-      {users.status === "error" && <ErrorState message={users.error} onRetry={users.reload} />}
-      {users.status === "success" && (
-        <>
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Joined</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {users.data.users.map((u) => {
-                  const isSelf = u.id === me?.id;
-                  return (
-                    <tr key={u.id}>
-                      <td title={u.email}>{u.email}</td>
-                      <td title={u.name ?? undefined}>{u.name ?? "—"}</td>
-                      <td>{u.role}</td>
-                      <td>{u.is_active ? "Active" : "Deactivated"}</td>
-                      <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                      <td className="admin-table__actions">
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => handleToggleRole(u)}
-                          title={
-                            isSelf && u.role === "admin"
-                              ? "Revoking the last admin's own role is blocked server-side"
-                              : undefined
-                          }
-                        >
-                          {u.role === "admin" ? "Revoke admin" : "Make admin"}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => handleToggleActive(u)}
-                          disabled={isSelf}
-                          title={isSelf ? "You can't deactivate your own account" : undefined}
-                        >
-                          {u.is_active ? "Deactivate" : "Reactivate"}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => handleImpersonate(u)}
-                          disabled={isSelf || u.role === "admin" || !u.is_active}
-                          title={
-                            isSelf
-                              ? "Already you"
-                              : u.role === "admin"
-                                ? "Cannot view as another admin"
-                                : !u.is_active
-                                  ? "Account is deactivated"
-                                  : "View the app as this user"
-                          }
-                        >
-                          View as
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      <section className="admin-panel" aria-labelledby="admin-people-heading">
+        <div className="admin-panel__head">
+          <h2 id="admin-people-heading" className="admin-panel__title">
+            People
+          </h2>
+        </div>
+        {users.status === "loading" && (
+          <div className="admin-panel__empty">
+            <LoadingState label="Loading users" />
           </div>
-          <div className="admin-page__pager">
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              disabled={userPage === 0}
-              onClick={() => setUserPage((p) => p - 1)}
-            >
-              &larr; Newer
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              disabled={users.data.users.length < PAGE_SIZE}
-              onClick={() => setUserPage((p) => p + 1)}
-            >
-              Older &rarr;
-            </button>
+        )}
+        {users.status === "error" && (
+          <div className="admin-panel__empty">
+            <ErrorState message={users.error} onRetry={users.reload} />
           </div>
-        </>
-      )}
+        )}
+        {users.status === "success" && (
+          <>
+            <div className="admin-panel__body">
+              <table className="admin-table admin-table--people">
+                <thead>
+                  <tr>
+                    <th scope="col">Email</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Joined</th>
+                    <th scope="col">
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.data.users.map((u) => {
+                    const isSelf = u.id === me?.id;
+                    return (
+                      <tr key={u.id}>
+                        <td title={u.email}>{u.email}</td>
+                        <td title={u.name ?? undefined}>{u.name ?? "—"}</td>
+                        <td>{u.role}</td>
+                        <td>{u.is_active ? "Active" : "Deactivated"}</td>
+                        <td>{new Date(u.created_at).toLocaleDateString()}</td>
+                        <td className="admin-table__actions">
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => handleToggleRole(u)}
+                            title={
+                              isSelf && u.role === "admin"
+                                ? "Revoking the last admin's own role is blocked server-side"
+                                : undefined
+                            }
+                          >
+                            {u.role === "admin" ? "Revoke admin" : "Make admin"}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => handleToggleActive(u)}
+                            disabled={isSelf}
+                            title={isSelf ? "You can't deactivate your own account" : undefined}
+                          >
+                            {u.is_active ? "Deactivate" : "Reactivate"}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => handleImpersonate(u)}
+                            disabled={isSelf || u.role === "admin" || !u.is_active}
+                            title={
+                              isSelf
+                                ? "Already you"
+                                : u.role === "admin"
+                                  ? "Cannot view as another admin"
+                                  : !u.is_active
+                                    ? "Account is deactivated"
+                                    : "View the app as this user"
+                            }
+                          >
+                            View as
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="admin-panel__foot">
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={userPage === 0}
+                onClick={() => setUserPage((p) => p - 1)}
+              >
+                &larr; Newer
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                disabled={users.data.users.length < PAGE_SIZE}
+                onClick={() => setUserPage((p) => p + 1)}
+              >
+                Older &rarr;
+              </button>
+            </div>
+          </>
+        )}
+      </section>
     </div>
   );
 }
