@@ -91,4 +91,6 @@ export const apiClient = {
   post: <T>(path: string, body?: unknown, options: Omit<RequestOptions, "method" | "body"> = {}) =>
     request<T>(path, { method: "POST", body, ...options }),
   postText: (path: string, body?: unknown) => request<string>(path, { method: "POST", body }),
+  put: <T>(path: string, body?: unknown) => request<T>(path, { method: "PUT", body }),
+  del: (path: string) => request<void>(path, { method: "DELETE" }),
 };

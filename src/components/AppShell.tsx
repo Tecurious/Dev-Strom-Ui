@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { useSidebar } from "../hooks/useSidebar";
+import { ImpersonationBanner } from "./ImpersonationBanner";
 import { ThemeToggle } from "./ThemeToggle";
 import { Sidebar } from "./sidebar/Sidebar";
 import "./AppShell.css";
@@ -51,6 +52,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <ThemeToggle />
         </div>
       </header>
+
+      <ImpersonationBanner />
 
       <Sidebar />
 

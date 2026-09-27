@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import { useIdeaGeneration } from "../../hooks/useIdeaGeneration";
 import { useSidebar } from "../../hooks/useSidebar";
 import { ProfileBlock } from "./ProfileBlock";
@@ -19,11 +20,26 @@ function PlusIcon() {
   );
 }
 
+function ShieldIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none">
+      <path
+        d="M12 3 5 6v5c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6l-7-3Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function Sidebar() {
   const { collapsed, setSidebarCollapsed } = useSidebar();
   const [generation] = useIdeaGeneration();
   const generating = generation.status === "loading";
   const { pathname } = useLocation();
+  const { user } = useAuth();
 
   // On mobile the sidebar is a drawer over the content — close it after a nav.
   useEffect(() => {
@@ -71,6 +87,21 @@ export function Sidebar() {
             </NavLink>
           ))}
         </nav>
+
+        {user?.role === "admin" && (
+          <nav className="sidebar__actions">
+            <NavLink
+              to="/admin"
+              className={({ isActive }) => "sidebar__action" + (isActive ? " is-active" : "")}
+              title="Admin"
+            >
+              <span className="sidebar__action-icon">
+                <ShieldIcon />
+              </span>
+              <span className="sidebar__action-label">Admin</span>
+            </NavLink>
+          </nav>
+        )}
 
         <div className="sidebar__runs">
           <RunList />
