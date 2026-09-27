@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { fetchArchifySpec, renderArchifySvg, type ArchifySpec } from "../../lib/archify";
+import { renderArchifySvg, type ArchifySpec } from "../../lib/archify";
 import { copyImage, downloadImage, downloadShareCard } from "./systemDiagramExport";
 import "./SystemDiagram.css";
 import "./SystemDiagramSvg.css";
@@ -90,9 +90,8 @@ export function ArchitectureDiagram({
     let cancelled = false;
     (async () => {
       try {
-        const source = spec ?? (await fetchArchifySpec(runId));
-        if (!source) throw new Error("no archify spec");
-        const svg = await renderArchifySvg(source);
+        if (!spec) throw new Error("no archify spec");
+        const svg = await renderArchifySvg(spec);
         if (!cancelled) setState({ status: "ready", svg });
       } catch (e) {
         console.error("System diagram unavailable, showing mermaid fallback:", e);

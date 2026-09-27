@@ -13,15 +13,3 @@ export async function renderArchifySvg(spec: ArchifySpec): Promise<string> {
   // Intrinsic size from the viewBox, so the SVG lays out at 1:1 before zoom.
   return svg.replace(/<svg viewBox="0 0 ([\d.]+) ([\d.]+)"/, '<svg viewBox="0 0 $1 $2" width="$1" height="$2"');
 }
-
-/** Fetch the stored archify spec for an analysis run; null when absent. */
-export async function fetchArchifySpec(runId: string): Promise<ArchifySpec | null> {
-  const { API_BASE } = await import("../../api/base");
-  try {
-    const res = await fetch(`${API_BASE}/analyze/${runId}/archify.json`, { credentials: "include" });
-    if (!res.ok) return null;
-    return (await res.json()) as ArchifySpec;
-  } catch {
-    return null;
-  }
-}
