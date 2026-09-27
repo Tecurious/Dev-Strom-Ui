@@ -1,10 +1,11 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { IdeaCard } from "../components/IdeaCard";
 import { SectionMarker } from "../components/SectionMarker";
 import { ErrorState, LoadingState } from "../components/StateBlocks";
 import { useIdeaGeneration, type IdeaBatch } from "../hooks/useIdeaGeneration";
 import type { IdeasRequest } from "../api/types";
+import { takeRerunPriors } from "../lib/rerun";
 import "./IdeasPage.css";
 
 const EXAMPLES = [
@@ -14,21 +15,28 @@ const EXAMPLES = [
 ];
 
 export function IdeasPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [intent, setIntent] = useState(() => searchParams.get("intent") ?? "");
   const [refinementContext, setRefinementContext] = useState("");
   const [showRefinement, setShowRefinement] = useState(false);
+  const autostartDone = useRef(false);
 
   const [state, run] = useIdeaGeneration();
 
-  const buildRequest = (refinement?: string, batches?: IdeaBatch[]): IdeasRequest => {
+  const buildRequest = (
+    refinement?: string,
+    batches?: IdeaBatch[],
+    priorOverride?: Array<{ name: string; problem_statement: string }>,
+  ): IdeasRequest => {
     const trimmed = intent.trim();
-    const prior_ideas = batches?.flatMap((batch) =>
-      batch.ideas.map((idea) => ({
-        name: idea.name,
-        problem_statement: idea.problem_statement,
-      })),
-    );
+    const prior_ideas =
+      priorOverride ??
+      batches?.flatMap((batch) =>
+        batch.ideas.map((idea) => ({
+          name: idea.name,
+          problem_statement: idea.problem_statement,
+        })),
+      );
     return {
       intent: trimmed,
       tech_stack: trimmed,
@@ -36,6 +44,18 @@ export function IdeasPage() {
       prior_ideas: prior_ideas?.length ? prior_ideas : undefined,
     };
   };
+
+  useEffect(() => {
+    if (autostartDone.current) return;
+    const mode = searchParams.get("autostart");
+    if (!mode || !intent.trim()) return;
+    autostartDone.current = true;
+    const priors = mode === "more" ? takeRerunPriors() : undefined;
+    setSearchParams({}, { replace: true });
+    void run(buildRequest(undefined, undefined, priors), { append: false });
+    // Intent + autostart only matter on first mount from a history rerun link.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot from URL
+  }, []);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
