@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { ImpersonationBanner } from "../components/ImpersonationBanner";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { useAuth } from "../hooks/useAuth";
 import "./LandingPage.css";
@@ -37,6 +38,7 @@ export function LandingPage() {
 
   return (
     <div className="landing">
+      <ImpersonationBanner />
       <header className="landing-nav">
         <div className="landing-nav__inner">
           <Link to="/" className="landing-nav__brand">
